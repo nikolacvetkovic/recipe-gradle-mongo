@@ -20,7 +20,7 @@ public class CategoryTest {
 
     @Test
     public void getId() {
-        Long id = 4L;
+        String id = "4";
 
         category.setId(id);
 
@@ -40,10 +40,10 @@ public class CategoryTest {
     public void getRecipes() {
         Set<Recipe> recipes = new HashSet<>();
         Recipe recipe1 = new Recipe();
-        recipe1.setId(1L);
+        recipe1.setId("1");
         recipes.add(recipe1);
         Recipe recipe2 = new Recipe();
-        recipe2.setId(2L);
+        recipe2.setId("2");
         recipes.add(recipe2);
 
         category.setRecipes(recipes);

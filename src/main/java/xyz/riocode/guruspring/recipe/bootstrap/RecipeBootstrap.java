@@ -2,7 +2,6 @@ package xyz.riocode.guruspring.recipe.bootstrap;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,31 +17,92 @@ import java.util.Optional;
 
 @Slf4j
 @Component
-@Profile("default")
 public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEvent> {
-
-
-    @Override
-    @Transactional
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        recipeRepository.saveAll(getRecipes());
-        log.debug("Loading Bootstrap Data");
-    }
 
     private final CategoryRepository categoryRepository;
     private final RecipeRepository recipeRepository;
     private final UnitOfMeasureRepository unitOfMeasureRepository;
 
-    public RecipeBootstrap(CategoryRepository categoryRepository, RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository) {
+    public RecipeBootstrap(CategoryRepository categoryRepository,
+                           RecipeRepository recipeRepository, UnitOfMeasureRepository unitOfMeasureRepository) {
         this.categoryRepository = categoryRepository;
         this.recipeRepository = recipeRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
+
     }
 
-    private List<Recipe> getRecipes(){
+    @Override
+    @Transactional
+    public void onApplicationEvent (ContextRefreshedEvent contextRefreshedEvent){
+        if (categoryRepository.count() == 0L) {
+            log.debug("Loading categories");
+            loadCategories();
+        }
+
+        if (unitOfMeasureRepository.count() == 0L) {
+            log.debug("Loading UOMs");
+            loadUom();
+        }
+    }
+
+    private void loadCategories () {
+        Category americanCategory = new Category();
+        americanCategory.setDescription("American");
+        categoryRepository.save(americanCategory);
+
+        Category italianCategory = new Category();
+        italianCategory.setDescription("Italian");
+        categoryRepository.save(italianCategory);
+
+        Category mexicanCategory = new Category();
+        mexicanCategory.setDescription("Mexican");
+        categoryRepository.save(mexicanCategory);
+
+        Category fastFoodCategory = new Category();
+        fastFoodCategory.setDescription("Fast Food");
+        categoryRepository.save(fastFoodCategory);
+    }
+
+    private void loadUom () {
+
+        UnitOfMeasure eachUom = new UnitOfMeasure();
+        eachUom.setDescription("Each");
+        unitOfMeasureRepository.save(eachUom);
+
+        UnitOfMeasure tableSpoonUom = new UnitOfMeasure();
+        tableSpoonUom.setDescription("Tablespoon");
+        unitOfMeasureRepository.save(tableSpoonUom);
+
+        UnitOfMeasure teapoonUom = new UnitOfMeasure();
+        teapoonUom.setDescription("Teaspoon");
+        unitOfMeasureRepository.save(teapoonUom);
+
+        UnitOfMeasure dashUom = new UnitOfMeasure();
+        dashUom.setDescription("Dash");
+        unitOfMeasureRepository.save(dashUom);
+
+        UnitOfMeasure pintUom = new UnitOfMeasure();
+        pintUom.setDescription("Pint");
+        unitOfMeasureRepository.save(pintUom);
+
+        UnitOfMeasure cupUom = new UnitOfMeasure();
+        cupUom.setDescription("Cup");
+        unitOfMeasureRepository.save(cupUom);
+
+        UnitOfMeasure ounceUom = new UnitOfMeasure();
+        ounceUom.setDescription("Ounce");
+        unitOfMeasureRepository.save(ounceUom);
+
+        UnitOfMeasure pinchUom = new UnitOfMeasure();
+        pinchUom.setDescription("Pinch");
+        unitOfMeasureRepository.save(pinchUom);
+    }
+
+    private List<Recipe> getRecipes() {
 
         List<Recipe> recipes = new ArrayList<>(2);
 
+        //get UOMs
         Optional<UnitOfMeasure> eachUomOptional = unitOfMeasureRepository.findByDescription("Each");
 
         if(!eachUomOptional.isPresent()){
@@ -67,24 +127,25 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
             throw new RuntimeException("Expected UOM Not Found");
         }
 
-        Optional<UnitOfMeasure> cupUomOptional = unitOfMeasureRepository.findByDescription("Cup");
-
-        if(!cupUomOptional.isPresent()){
-            throw new RuntimeException("Expected UOM Not Found");
-        }
-
         Optional<UnitOfMeasure> pintUomOptional = unitOfMeasureRepository.findByDescription("Pint");
 
         if(!pintUomOptional.isPresent()){
             throw new RuntimeException("Expected UOM Not Found");
         }
 
+        Optional<UnitOfMeasure> cupsUomOptional = unitOfMeasureRepository.findByDescription("Cup");
+
+        if(!cupsUomOptional.isPresent()){
+            throw new RuntimeException("Expected UOM Not Found");
+        }
+
+        //get optionals
         UnitOfMeasure eachUom = eachUomOptional.get();
         UnitOfMeasure tableSpoonUom = tableSpoonUomOptional.get();
         UnitOfMeasure teapoonUom = tableSpoonUomOptional.get();
         UnitOfMeasure dashUom = dashUomOptional.get();
-        UnitOfMeasure pintUom = pintUomOptional.get();
-        UnitOfMeasure cupsUom = cupUomOptional.get();
+        UnitOfMeasure pintUom = dashUomOptional.get();
+        UnitOfMeasure cupsUom = cupsUomOptional.get();
 
         //get Categories
         Optional<Category> americanCategoryOptional = categoryRepository.findByDescription("American");
@@ -129,9 +190,10 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
                 "\n" +
                 "\n" +
                 "Read more: http://www.simplyrecipes.com/recipes/perfect_guacamole/#ixzz4jvoun5ws");
-        guacNotes.setRecipe(guacRecipe);
+
         guacRecipe.setNotes(guacNotes);
 
+        //very redundent - could add helper method, and make this simpler
         guacRecipe.addIngredient(new Ingredient("ripe avocados", new BigDecimal(2), eachUom));
         guacRecipe.addIngredient(new Ingredient("Kosher salt", new BigDecimal(".5"), teapoonUom));
         guacRecipe.addIngredient(new Ingredient("fresh lime juice or lemon juice", new BigDecimal(2), tableSpoonUom));
@@ -144,9 +206,9 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         guacRecipe.getCategories().add(americanCategory);
         guacRecipe.getCategories().add(mexicanCategory);
 
-        guacRecipe.setUrl("https://www.allrecipes.com/recipe/43655/perfect-turkey/?internalSource=streams&referringId=975&referringContentType=Recipe%20Hub&clickId=st_trending_b");
+        guacRecipe.setUrl("http://www.simplyrecipes.com/recipes/perfect_guacamole/");
         guacRecipe.setServings(4);
-        guacRecipe.setSource("All Recipes");
+        guacRecipe.setSource("Simply Recipes");
 
         //add to return list
         recipes.add(guacRecipe);
@@ -180,9 +242,8 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
                 "\n" +
                 "\n" +
                 "Read more: http://www.simplyrecipes.com/recipes/spicy_grilled_chicken_tacos/#ixzz4jvu7Q0MJ");
-        tacoNotes.setRecipe(tacosRecipe);
-        tacosRecipe.setNotes(tacoNotes);
 
+        tacosRecipe.setNotes(tacoNotes);
 
         tacosRecipe.addIngredient(new Ingredient("Ancho Chili Powder", new BigDecimal(2), tableSpoonUom));
         tacosRecipe.addIngredient(new Ingredient("Dried Oregano", new BigDecimal(1), teapoonUom));
@@ -206,6 +267,10 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
 
         tacosRecipe.getCategories().add(americanCategory);
         tacosRecipe.getCategories().add(mexicanCategory);
+
+        tacosRecipe.setUrl("http://www.simplyrecipes.com/recipes/spicy_grilled_chicken_tacos/");
+        tacosRecipe.setServings(4);
+        tacosRecipe.setSource("Simply Recipes");
 
         recipes.add(tacosRecipe);
         return recipes;

@@ -33,10 +33,10 @@ public class UnitOfMeasureServiceImplTest {
     @Test
     public void listAllUoms() {
         UnitOfMeasure unitOfMeasure1 = new UnitOfMeasure();
-        unitOfMeasure1.setId(1L);
+        unitOfMeasure1.setId("1");
 
         UnitOfMeasure unitOfMeasure2 = new UnitOfMeasure();
-        unitOfMeasure2.setId(2L);
+        unitOfMeasure2.setId("2");
 
         Set<UnitOfMeasure> unitOfMeasures = new HashSet<>();
         unitOfMeasures.add(unitOfMeasure1);

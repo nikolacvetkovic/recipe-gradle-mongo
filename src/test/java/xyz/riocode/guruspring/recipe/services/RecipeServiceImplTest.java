@@ -60,48 +60,48 @@ public class RecipeServiceImplTest {
     @Test
     public void testFindById() {
         Recipe recipeToBeReturned = new Recipe();
-        recipeToBeReturned.setId(1L);
+        recipeToBeReturned.setId("1");
         Optional<Recipe> recipeOpt = Optional.of(recipeToBeReturned);
 
-        when(recipeRepository.findById(anyLong())).thenReturn(recipeOpt);
+        when(recipeRepository.findById(any())).thenReturn(recipeOpt);
 
-        Recipe recipe = recipeService.findById(1L);
+        Recipe recipe = recipeService.findById("1");
 
         assertNotNull("Null recipe returned", recipe);
-        verify(recipeRepository, times(1)).findById(anyLong());
+        verify(recipeRepository, times(1)).findById(any());
         verify(recipeRepository, never()).findAll();
 
     }
 
     @Test(expected = NotFoundException.class)
     public void testFindByIdNotFound(){
-        when(recipeRepository.findById(anyLong())).thenReturn(Optional.empty());
+        when(recipeRepository.findById(any())).thenReturn(Optional.empty());
 
-        Recipe recipe = recipeService.findById(anyLong());
+        Recipe recipe = recipeService.findById(any());
     }
 
     @Test
     public void testFindRecipeCommandById(){
-        Long id = 1L;
+        String id = "1";
         Recipe recipe = new Recipe();
         recipe.setId(id);
 
         RecipeCommand recipeCommandToBeReturned = new RecipeCommand();
         recipeCommandToBeReturned.setId(id);
 
-        when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(recipe));
+        when(recipeRepository.findById(any())).thenReturn(Optional.of(recipe));
         when(recipeToRecipeCommand.convert(any())).thenReturn((recipeCommandToBeReturned));
 
         RecipeCommand recipeCommand = recipeService.findCommandById(id);
 
         assertNotNull(recipeCommand);
         assertEquals(id, recipeCommand.getId());
-        verify(recipeRepository).findById(anyLong());
+        verify(recipeRepository).findById(any());
     }
 
     @Test
     public void testDeleteById(){
-        recipeService.deleteById(1L);
-        verify(recipeRepository).deleteById(anyLong());
+        recipeService.deleteById("1");
+        verify(recipeRepository).deleteById(any());
     }
 }

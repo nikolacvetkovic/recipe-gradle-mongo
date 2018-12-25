@@ -1,6 +1,7 @@
 package xyz.riocode.guruspring.recipe.controllers;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -49,16 +50,16 @@ public class ImageControllerTest {
     @Test
     public void getNewImageForm() throws Exception {
         RecipeCommand recipeCommand = new RecipeCommand();
-        recipeCommand.setId(1L);
+        recipeCommand.setId("1");
 
-        when(recipeService.findCommandById(anyLong())).thenReturn(recipeCommand);
+        when(recipeService.findCommandById(any())).thenReturn(recipeCommand);
 
         mockMvc.perform(get("/recipe/1/image"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("recipe/imageuploadform"))
                 .andExpect(model().attributeExists("recipe"));
 
-        verify(recipeService).findCommandById(anyLong());
+        verify(recipeService).findCommandById(any());
     }
 
     @Test
@@ -70,7 +71,7 @@ public class ImageControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(header().string("Location", "/recipe/1/show"));
 
-        verify(imageService).saveImageFile(anyLong(), any());
+        verify(imageService).saveImageFile(any(), any());
     }
 
     @Test
@@ -87,7 +88,7 @@ public class ImageControllerTest {
 
         recipe.setImage(image);
 
-        when(recipeService.findById(anyLong())).thenReturn(recipe);
+        when(recipeService.findById(any())).thenReturn(recipe);
 
         MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/recipeimage"))
                 .andExpect(status().isOk())
@@ -98,6 +99,7 @@ public class ImageControllerTest {
         assertArrayEquals(s.getBytes(), responseBytes);
     }
 
+    @Ignore
     @Test
     public void testGetImageNumberFormatException() throws Exception {
 

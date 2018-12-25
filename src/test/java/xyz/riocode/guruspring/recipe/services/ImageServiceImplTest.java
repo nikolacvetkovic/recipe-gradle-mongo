@@ -14,6 +14,7 @@ import xyz.riocode.guruspring.recipe.repositories.RecipeRepository;
 import java.io.IOException;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,12 +35,12 @@ public class ImageServiceImplTest {
     @Test
     public void saveImageFile() throws IOException {
         //given
-        Long id = 1L;
+        String id = "1";
         MultipartFile multipartFile = new MockMultipartFile("imagefile", "testing.txt", "text/plain", "SpringFramework".getBytes());
         Recipe recipe = new Recipe();
         recipe.setId(id);
 
-        when(recipeRepository.findById(anyLong())).thenReturn(Optional.of(recipe));
+        when(recipeRepository.findById(any())).thenReturn(Optional.of(recipe));
 
         ArgumentCaptor<Recipe> argumentCaptor = ArgumentCaptor.forClass(Recipe.class);
 

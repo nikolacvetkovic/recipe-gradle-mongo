@@ -1,5 +1,6 @@
 package xyz.riocode.guruspring.recipe.services;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,7 @@ public class RecipeServiceImplIT {
     @Autowired
     RecipeCommandToRecipe recipeCommandToRecipe;
 
+    @Ignore
     @Transactional
     @Test
     public void testSaveOfDescription() {
